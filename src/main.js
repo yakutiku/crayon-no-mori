@@ -5,6 +5,7 @@ import { getSettings, onSettingsChange } from './core/settings.js';
 import { levelFor, recordDone } from './core/level.js';
 import { unlockAudio, sfx } from './core/sound.js';
 import { initSpeech, speak, stopSpeech } from './core/speech.js';
+import { startBgm, stopBgm, refreshBgm } from './core/bgm.js';
 import { word } from './core/words.js';
 import { cheer, bounce, wobble, bubble } from './core/feedback.js';
 import { draggable, releaseAllDrags } from './core/drag.js';
@@ -42,7 +43,11 @@ document.addEventListener('touchend', (e) => {
   if (now - lastTouchEnd < 350 && !e.target.closest('.panel')) e.preventDefault(); // ダブルタップで拡大しない
   lastTouchEnd = now;
 }, { passive: false });
-document.addEventListener('pointerdown', () => { unlockAudio(); requestWakeLock(); }, { capture: true });
+document.addEventListener('pointerdown', () => {
+  unlockAudio();
+  if (!document.querySelector('.bedtime')) startBgm();
+  requestWakeLock();
+}, { capture: true });
 
 // ── 画面が暗くならないように（使える端末だけ） ──
 let wakeLock = null;
@@ -55,7 +60,7 @@ async function requestWakeLock() {
 }
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') requestWakeLock();
-  else stopSpeech();
+  else { stopSpeech(); stopBgm(); }
 });
 
 // ── 3秒長押しの印（保護者用） ──
@@ -243,8 +248,9 @@ function showBedtime() {
   if (current) current.cleanup(), current = null, location.hash = '#/';
   app.appendChild(ov);
   stopSpeech();
+  stopBgm();
 }
-onSettingsChange(() => { bedStart = Date.now(); scheduleBedtime(); });
+onSettingsChange(() => { bedStart = Date.now(); scheduleBedtime(); refreshBgm(); });
 
 // ── オフライン用の仕組みを登録 ──
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

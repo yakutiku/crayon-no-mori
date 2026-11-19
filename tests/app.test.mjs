@@ -108,6 +108,45 @@ for (const device of ['iphone', 'fire']) {
   await t.close();
 }
 
+// ── BGM ──
+{
+  console.log('BGM');
+  const t = await open('iphone', { server });
+  const { page } = t;
+  await page.goto(t.url);
+  await page.waitForSelector('.game-btn');
+  await tap(page, '.game-btn[data-game="colors"]');
+  await sleep(800);
+  check(await page.evaluate(() => document.body.dataset.bgm !== '1'), '初期設定では BGM は流れない');
+  await tap(page, '[data-home]');
+  await page.waitForSelector('[data-hold]');
+  const hb = await page.locator('[data-hold]').boundingBox();
+  await page.mouse.move(hb.x + 28, hb.y + 28);
+  await page.mouse.down(); await sleep(3300); await page.mouse.up();
+  await page.waitForSelector('[data-panel]');
+  check(await page.locator('[data-setting="bgm"] button').count() === 2, '保護者設定に BGM の項目がある');
+  await page.click('[data-setting="bgm"] button[data-value="true"]');
+  await sleep(300);
+  check(await page.evaluate(() => document.body.dataset.bgm === '1'), 'BGM をありにすると流れ始める');
+  await shot(page, 'panel-bgm');
+  await page.click('[data-close]');
+  await page.reload();
+  await page.waitForSelector('.game-btn');
+  await tap(page, '.game-btn[data-game="candles"]');
+  await sleep(500);
+  check(await page.evaluate(() => document.body.dataset.bgm === '1'), '再起動後も、画面に触れると BGM が流れる');
+  await tap(page, '[data-home]');
+  await page.waitForSelector('[data-hold]');
+  await page.mouse.move(hb.x + 28, hb.y + 28);
+  await page.mouse.down(); await sleep(3300); await page.mouse.up();
+  await page.waitForSelector('[data-panel]');
+  await page.click('[data-setting="bgm"] button[data-value="false"]');
+  await sleep(300);
+  check(await page.evaluate(() => document.body.dataset.bgm === '0'), 'BGM をなしにすると止まる');
+  check(t.errors.length === 0, 'エラーなし ' + t.errors.join(' | '));
+  await t.close();
+}
+
 // ── おしまいの合図 ──
 {
   console.log('おしまいの合図');
