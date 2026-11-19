@@ -42,8 +42,8 @@ for (const device of ['iphone', 'fire']) {
   await shot(page, `home-${device}`);
 
   // ボタンがはみ出していない・64px以上
-  const boxes = await page.locator('.game-btn').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().toJSON()));
-  check(boxes.every((b) => b.width >= 64 && b.height >= 64 && b.left >= 0 && b.right <= innerWidth), 'ボタンの大きさと位置');
+  const boxes = await page.locator('.game-btn').evaluateAll((els) => els.map((e) => ({ ...e.getBoundingClientRect().toJSON(), vw: innerWidth })));
+  check(boxes.every((b) => b.width >= 64 && b.height >= 64 && b.left >= 0 && b.right <= b.vw), 'ボタンの大きさと位置');
 
   // 各遊びを開いて、おうちで戻る
   for (const id of IDS) {
