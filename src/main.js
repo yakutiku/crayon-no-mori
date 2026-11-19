@@ -23,6 +23,7 @@ export const GAMES = [colors, shapes, sizes, lengths, peekaboo, drawing, candles
 const app = document.getElementById('app');
 let current = null; // { game, cleanup }
 let doneCount = 0;
+let updateReady = false;
 
 installCssVars();
 installCrayonDefs();
@@ -204,7 +205,10 @@ function route() {
   const m = location.hash.match(/^#\/([a-z]+)(?:\?level=(\d))?/);
   const game = m && GAMES.find((g) => g.id === m[1]);
   if (game) showGame(game, m[2] ? Number(m[2]) : 0);
-  else showHome();
+  else {
+    if (updateReady) { location.reload(); return; }
+    showHome();
+  }
   checkBedtime();
 }
 window.addEventListener('hashchange', route);
@@ -245,6 +249,10 @@ onSettingsChange(() => { bedStart = Date.now(); scheduleBedtime(); });
 // ── オフライン用の仕組みを登録 ──
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // 新しい版が届いたら、遊びの途中ではなく、ホームに戻ったときにそっと入れ替える
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => { updateReady = true; if (!current) location.reload(); });
+  }
 }
 
 route();
