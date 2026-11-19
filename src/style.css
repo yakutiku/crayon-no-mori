@@ -1,0 +1,115 @@
+/* 色は palette.js から CSS 変数（var(--paper) など）として入る */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: var(--paper);
+  color: var(--brown);
+  font-family: "Hiragino Maru Gothic ProN", "Hiragino Maru Gothic Pro", "HG丸ｺﾞｼｯｸM-PRO", "Rounded Mplus 1c", "M PLUS Rounded 1c", "Noto Sans JP", "Hiragino Sans", "Noto Sans CJK JP", system-ui, sans-serif;
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+body { position: fixed; inset: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+svg { display: block; overflow: visible; }
+img, svg { -webkit-user-drag: none; }
+
+#app {
+  position: absolute; inset: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  display: flex; flex-direction: column;
+}
+.screen { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; animation: fade-in .45s ease; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── ホーム画面 ── */
+.home-head { position: relative; height: 84px; flex: none; display: flex; align-items: center; justify-content: center; }
+.home-title { width: min(78vw, 440px); height: 64px; }
+.home-grid {
+  flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  display: grid; gap: 18px; padding: 8px 20px 28px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  align-content: center; justify-items: center;
+}
+@media (orientation: landscape) and (min-width: 900px) {
+  .home-grid { grid-template-columns: repeat(4, minmax(160px, 220px)); justify-content: center; gap: 22px 34px; }
+}
+.game-btn {
+  width: 100%; max-width: 220px; aspect-ratio: 1 / 1.08;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  border-radius: 28px; background: var(--white);
+  box-shadow: 0 4px 0 var(--graySoft), 0 6px 14px var(--shadow);
+  transition: transform .15s ease;
+}
+.game-btn:active { transform: scale(.96); }
+.game-btn .ic { width: 74%; aspect-ratio: 1; }
+.game-btn .ic svg { width: 100%; height: 100%; }
+.game-btn .lbl { font-size: 17px; font-weight: 700; letter-spacing: .04em; }
+
+/* ── 保護者の印（3秒長押し） ── */
+.hold { position: absolute; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; z-index: 30; opacity: .55; touch-action: none; }
+.hold svg { width: 34px; height: 34px; }
+.hold .ring { position: absolute; inset: 4px; width: 48px; height: 48px; }
+.hold.top-right { top: 12px; right: 10px; }
+.hold.bottom-right { bottom: 14px; right: 14px; }
+
+/* ── 遊びの画面 ── */
+.topbar { height: 80px; flex: none; position: relative; display: flex; align-items: center; padding: 0 12px; z-index: 20; }
+.home-btn { width: 68px; height: 68px; border-radius: 22px; background: var(--white); box-shadow: 0 3px 0 var(--graySoft), 0 4px 10px var(--shadow); display: flex; align-items: center; justify-content: center; }
+.home-btn svg { width: 52px; height: 52px; }
+.home-btn:active { transform: scale(.94); }
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; }
+.fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+
+/* ドラッグ */
+.draggable { cursor: grab; will-change: transform; }
+.dragging { z-index: 40 !important; filter: drop-shadow(0 10px 8px var(--shadow)); cursor: grabbing; }
+.dragging > * { transform: scale(1.08); transition: transform .15s; }
+
+/* 反応 */
+.cheer-bit { position: absolute; width: 34px; height: 34px; pointer-events: none; }
+.bubble {
+  position: absolute; z-index: 60; pointer-events: none;
+  background: var(--white); border: 3px solid var(--brownSoft); border-radius: 22px;
+  padding: 8px 18px 10px; text-align: center; min-width: 96px;
+  box-shadow: 0 4px 10px var(--shadow);
+  opacity: 0; transform: translateY(8px) scale(.9); transition: opacity .35s ease, transform .35s ease;
+}
+.bubble.show { opacity: 1; transform: none; }
+.bubble-ja { font-size: 30px; font-weight: 700; letter-spacing: .06em; line-height: 1.25; }
+.bubble-kana { font-size: 19px; line-height: 1.3; color: var(--brownSoft); }
+.bubble-en { font-size: 22px; line-height: 1.2; font-family: "Avenir Next Rounded", "Arial Rounded MT Bold", "Avenir Next", system-ui, sans-serif; letter-spacing: .03em; }
+
+/* もういっかい */
+.again-btn { position: absolute; left: 50%; bottom: 22px; width: 96px; height: 96px; margin-left: -48px; z-index: 55; animation: again-in .8s ease both; }
+.again-btn svg { width: 100%; height: 100%; }
+@keyframes again-in { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+
+/* おしまいの合図 */
+.bedtime { position: absolute; inset: 0; z-index: 90; background: var(--night); display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--white); animation: fade-in 3s ease both; }
+.bedtime svg.moon { width: min(60vw, 320px); height: auto; }
+.bedtime .bt-text { font-size: 34px; font-weight: 700; letter-spacing: .2em; margin-top: 16px; }
+
+/* 保護者設定 */
+.panel { position: absolute; inset: 0; z-index: 95; background: var(--paper); overflow-y: auto; -webkit-overflow-scrolling: touch; -webkit-user-select: text; user-select: text; touch-action: pan-y; animation: fade-in .3s ease; }
+.panel-in { max-width: 640px; margin: 0 auto; padding: calc(16px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom)); }
+.panel h1 { font-size: 22px; margin: 4px 0 18px; }
+.panel h2 { font-size: 17px; margin: 26px 0 8px; }
+.panel p, .panel li { font-size: 15px; line-height: 1.75; }
+.panel .row { background: var(--white); border-radius: 16px; padding: 14px 16px; margin: 10px 0; box-shadow: 0 2px 6px var(--shadow); }
+.panel .row-label { font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+.panel .row-note { font-size: 13px; color: var(--brownSoft); margin-top: 8px; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg button { min-height: 44px; padding: 8px 14px; border-radius: 12px; background: var(--graySoft); font-size: 15px; }
+.seg button[aria-pressed="true"] { background: var(--green); color: var(--white); font-weight: 700; }
+.panel .close { position: sticky; top: 0; float: right; min-height: 44px; padding: 8px 18px; border-radius: 12px; background: var(--brown); color: var(--white); font-size: 15px; font-weight: 700; z-index: 2; }
+.panel .link-btn { min-height: 44px; padding: 10px 16px; border-radius: 12px; background: var(--sky); font-size: 15px; font-weight: 700; margin-top: 4px; }
+.panel .small-btn { min-height: 40px; padding: 8px 14px; border-radius: 12px; background: var(--graySoft); font-size: 14px; }
+.guide h3 { font-size: 16px; margin: 20px 0 6px; }
+.guide ol, .guide ul { padding-left: 1.4em; margin: 6px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
