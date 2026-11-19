@@ -1,6 +1,6 @@
 // オフライン用（Service Worker）。初回に全部のファイルを端末に保存し、以降は通信なしで動く。
 // ファイル一覧とバージョンは tools/update-sw.mjs が書き換える（手で直さない）
-const VERSION = 'v-6c7bdc20dc';
+const VERSION = 'v-8f3b2d66a5';
 const FILES = [
   // FILES-START
   './',
@@ -10,6 +10,7 @@ const FILES = [
   './src/art/coloring.js',
   './src/art/scenes.js',
   './src/art/things.js',
+  './src/core/bgm.js',
   './src/core/crayon.js',
   './src/core/drag.js',
   './src/core/feedback.js',

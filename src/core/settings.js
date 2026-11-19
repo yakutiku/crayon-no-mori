@@ -4,6 +4,7 @@ const KEY = 'crayon-no-mori:settings:v1';
 export const DEFAULTS = {
   sound: 'none',        // 'none' | 'sfx' | 'voice'（声＋効果音）
   volume: 'small',      // 'small' | 'medium'
+  bgm: false,           // BGM（やさしいオルゴール）なし / あり
   english: false,       // false=日本語のみ / true=日本語＋英語
   hidden: [],           // 表示しない遊びの id
   level: 'auto',        // 'auto' | 1 | 2 | 3

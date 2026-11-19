@@ -5,7 +5,8 @@ let ac = null;
 
 // iPhone では、指で触ったときに初めて音の準備ができる
 export function unlockAudio() {
-  if (getSettings().sound === 'none') return;
+  const st = getSettings();
+  if (st.sound === 'none' && !st.bgm) return;
   try {
     if (!ac) {
       const AC = window.AudioContext || window.webkitAudioContext;
@@ -15,6 +16,9 @@ export function unlockAudio() {
     if (ac.state === 'suspended') ac.resume();
   } catch (e) { ac = null; }
 }
+
+// BGM からも同じ音の準備を使う
+export function audioContext() { return ac; }
 
 const NOTE = { C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880, C6: 1046.5, G4: 392, E4: 329.63, C4: 261.63 };
 

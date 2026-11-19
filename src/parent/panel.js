@@ -4,6 +4,7 @@ import { getSettings, setSetting } from '../core/settings.js';
 import { voiceStatus } from '../core/speech.js';
 import { resetLevels } from '../core/level.js';
 import { unlockAudio, sfx } from '../core/sound.js';
+import { refreshBgm } from '../core/bgm.js';
 import { speak } from '../core/speech.js';
 import { guideHtml } from './guide.js';
 
@@ -78,7 +79,8 @@ export function openPanel(app, onClose) {
       h('h1', { text: '保護者設定' }),
       row('音', seg('sound', [['none', 'なし'], ['sfx', '効果音のみ'], ['voice', '声＋効果音']], () => unlockAudio()), voiceNote),
       test,
-      row('音の大きさ', seg('volume', [['small', '小'], ['medium', '中']])),
+      row('BGM', seg('bgm', [[false, 'なし'], [true, 'あり']], () => { unlockAudio(); refreshBgm(); }), 'オルゴールのような、ゆっくりした曲が小さく流れます。「音」の設定とは別に切り替えられます。'),
+      row('音の大きさ', seg('volume', [['small', '小'], ['medium', '中']]), '効果音・声・BGMの大きさです。'),
       row('英語', seg('english', [[false, '日本語のみ'], [true, '日本語＋英語']]), '英語オンのときは「いぬ／ドッグ／dog」のように文字が出て、声も日本語のあとに英語を言います。'),
       row('遊びの表示（緑が表示中）', hiddenBox),
       row('レベル', seg('level', [['auto', '自動で上がる'], [1, '1に固定'], [2, '2に固定'], [3, '3に固定']]), '自動：同じレベルを3回最後まで遊ぶと、次に開いたとき1つ上がります。'),
