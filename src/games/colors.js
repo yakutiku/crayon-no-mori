@@ -128,14 +128,20 @@ function round(root, ctx) {
       onDrop: (t) => {
         const b = baskets.find((x) => x.el === t);
         el.dataset.placed = '1';
-        el.style.transition = 'opacity .3s, transform .3s';
+        // かごの中へ、すっと入っていく
+        el.style.transition = 'opacity .45s ease .1s, transform .45s ease-in';
+        el.style.transform += ` translateY(${bh * 0.35}px) scale(0.35)`;
         el.style.opacity = '0';
-        ctx.later(() => el.remove(), 320);
+        ctx.later(() => el.remove(), 600);
         // かごの中に、ものが小さく顔を出す
         const mini = thing(it.key, it.color.color);
         mini.style.width = (bw * 0.3) + 'px'; mini.style.height = (bw * 0.3) + 'px';
         mini.style.margin = `0 ${-bw * 0.04}px`;
+        mini.style.transition = 'transform .5s ease-in, opacity .4s ease';
+        mini.style.opacity = '0';
+        mini.style.transform = 'translateY(-30%)';
         b.inside.appendChild(mini);
+        ctx.later(() => { mini.style.opacity = '1'; mini.style.transform = 'none'; }, 350);
         b.count += 1;
         ctx.sfx('fit');
         ctx.bounce(b.el);
@@ -150,6 +156,15 @@ function round(root, ctx) {
 
 // おかたづけ：かごにふたが閉まり、棚に並ぶ
 function tidyUp(root, ctx, baskets, bw, bh) {
+  // 中のものが、かごの奥へ沈んで見えなくなる → そのあとふたが閉まる
+  baskets.forEach((b) => {
+    b.inside.style.overflow = 'hidden';
+    [...b.inside.children].forEach((m) => { m.style.transform = `translateY(${bh * 0.5}px)`; m.style.opacity = '0'; });
+  });
+  ctx.later(() => closeLids(root, ctx, baskets, bw, bh), 600);
+}
+
+function closeLids(root, ctx, baskets, bw, bh) {
   baskets.forEach((b, i) => {
     const lid = lidArt(b.color.color);
     lid.style.cssText = `position:absolute;left:-2%;width:104%;height:${bw * 0.26}px;top:${-bh * 0.6}px;opacity:0;transition:top .7s ease ${i * 0.15}s, opacity .4s ease ${i * 0.15}s`;

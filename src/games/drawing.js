@@ -191,7 +191,20 @@ export default {
       g.style.cssText = 'position:absolute;inset:0;width:100%;height:100%';
       area.appendChild(g);
       const regs = [...g.querySelectorAll('[data-region]')];
-      regs.forEach((r) => r.addEventListener('click', () => {
+      // タップした場所の区画を、形の計算で探す（iPhone の Safari ではフィルター付きの絵に
+      // click が届かないことがあるため、要素のクリックには頼らない）
+      const pick = (x, y) => {
+        const m = g.getScreenCTM && g.getScreenCTM();
+        if (m && regs[0].isPointInFill) {
+          const pt = new DOMPoint(x, y).matrixTransform(m.inverse());
+          for (let i = regs.length - 1; i >= 0; i--) {
+            try { if (regs[i].isPointInFill(pt)) return regs[i]; } catch (e) { break; }
+          }
+        }
+        const el = document.elementFromPoint(x, y);
+        return el && el.closest ? el.closest('[data-region]') : null;
+      };
+      const paint = (r) => {
         r.setAttribute('fill', S.color.color);
         r.dataset.filled = '1';
         ctx.sfx('tap');
@@ -199,7 +212,18 @@ export default {
           S.completed.add(S.sheet);
           ctx.later(() => { ctx.sfx('tada'); ctx.cheer(g, { count: 8, spread: 120 }); ctx.done(); }, 500);
         }
-      }));
+      };
+      let down = null;
+      g.addEventListener('pointerdown', (e) => { e.preventDefault(); down = { x: e.clientX, y: e.clientY, id: e.pointerId }; });
+      g.addEventListener('pointerup', (e) => {
+        if (!down || e.pointerId !== down.id) return;
+        const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+        down = null;
+        if (moved > 30) return;
+        const r = pick(e.clientX, e.clientY);
+        if (r) paint(r);
+      });
+      g.addEventListener('pointercancel', () => { down = null; });
     }
 
     function show() {
