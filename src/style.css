@@ -60,8 +60,8 @@ img, svg { -webkit-user-drag: none; }
 .home-btn { width: 68px; height: 68px; border-radius: 22px; background: var(--white); box-shadow: 0 3px 0 var(--graySoft), 0 4px 10px var(--shadow); display: flex; align-items: center; justify-content: center; }
 .home-btn svg { width: 52px; height: 52px; }
 .home-btn:active { transform: scale(.94); }
-.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; }
-.fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; isolation: isolate; z-index: 0; }
+.fx-layer { position: absolute; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; transform: translateZ(0); -webkit-transform: translateZ(0); }
 
 /* ドラッグ */
 .draggable { cursor: grab; will-change: transform; }

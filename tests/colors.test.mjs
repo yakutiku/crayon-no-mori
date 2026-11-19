@@ -34,7 +34,7 @@ for (const device of ['iphone', 'fire']) {
       await sleep(450);
       if (i === 0 && level === 1) await shot(page, `colors-${device}-bubble`);
     }
-    await sleep(3500);
+    await sleep(5000);
     check(await doneCount(page) === 1, 'おかたづけまで進んで done になる');
     check(await page.locator('[data-again]').count() === 1, '「もういっかい」が出る');
     if (level === 3) await shot(page, `colors-${device}-done`);

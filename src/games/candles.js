@@ -165,9 +165,33 @@ export default {
       }
 
       function blow(c, fl, i) {
-        if (busy || !fl.isConnected) return;
+        if (busy || !fl.isConnected || fl.dataset.blowing) return;
+        fl.dataset.blowing = '1';
         ctx.sfx('blow');
         const x = XS[i]; const y = BASE_Y - 80;
+        // どうぶつの鼻（口）から、ふーっと風が炎へ向かう
+        const nose = { x: 194, y: 140 };
+        ctx.bounce(back);
+        for (let j = 0; j < 3; j++) {
+          const ox = (j - 1) * 10; const oy = (j - 1) * 8;
+          const mx = (nose.x + x) / 2 + ox + (x < nose.x ? 20 : -20); const my = (nose.y + y) / 2 + oy - 10;
+          const wind = s('path', { d: `M${nose.x + ox / 2} ${nose.y + 6 + oy / 2} Q${mx} ${my} ${x + ox / 3} ${y + oy / 2}`, fill: 'none', stroke: P.sky, 'stroke-width': 7 - j, 'stroke-linecap': 'round', opacity: 0.9 });
+          candleLayer.append(wind);
+          const len = wind.getTotalLength ? wind.getTotalLength() : 200;
+          wind.setAttribute('stroke-dasharray', `${len * 0.35} ${len * 2}`);
+          wind.setAttribute('stroke-dashoffset', String(len * 0.35));
+          const a = wind.animate && wind.animate(
+            [{ strokeDashoffset: len * 0.35, opacity: 0.9 }, { strokeDashoffset: -len * 0.9, opacity: 0.2 }],
+            { duration: 700, delay: j * 90, easing: 'ease-in', fill: 'backwards' },
+          );
+          if (a) a.onfinish = () => wind.remove(); else wind.remove();
+        }
+        // 風が届いたら炎が消える
+        ctx.later(() => blowOut(c, fl, i, x, y), 560);
+      }
+
+      function blowOut(c, fl, i, x, y) {
+        if (!fl.isConnected) return;
         fl.remove();
         scene.dataset.lit = String(scene.querySelectorAll('[data-flame]').length);
         for (let j = 0; j < 3; j++) {

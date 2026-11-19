@@ -24,9 +24,10 @@ for (const device of ['iphone', 'fire']) {
   if (device === 'fire') await shot(page, 'candles-fire-5');
 
   for (let i = 0; i < 5; i++) {
-    await tap(page, '[data-flame]');
+    await tap(page, '[data-flame]:not([data-blowing])');
     await sleep(350);
   }
+  await sleep(800);
   check(await page.locator('[data-flame]').count() === 0, '全部消えた');
   await sleep(1500);
   check(await doneCount(page) === 1, 'done が増える');

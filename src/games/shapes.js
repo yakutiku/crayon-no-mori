@@ -1,5 +1,5 @@
 // ② かたちあわせ：木の板の穴に、同じかたちのピースをはめる（モンテッソーリの「幾何図形のはめ込み」）
-import { P } from '../core/palette.js';
+import { P, LEARN_COLORS } from '../core/palette.js';
 import { s, svg, h, line, flower, shuffle, CRAYON, CRAYON_LITE } from '../core/crayon.js';
 
 const LEVELS = { 1: ['circle', 'square'], 2: ['circle', 'square', 'triangle'], 3: ['circle', 'square', 'triangle', 'star', 'heart'] };
@@ -22,11 +22,12 @@ const PATHS = {
   heart: 'M50 88 C8 58 4 30 26 18 C38 12 47 19 50 28 C53 19 62 12 74 18 C96 30 92 58 50 88 Z',
 };
 
-// ピース（ぜんぶ同じ青。まるいつまみ付き）
+// ピース（1回の中ではぜんぶ同じ色。色は回ごとに4色から選ぶ。まるいつまみ付き）
+let pieceColor = P.blue;
 function pieceArt(shape) {
   const g = svg(100, 100);
   g.append(
-    s('path', { d: PATHS[shape], fill: P.blue, ...line(4.5), 'stroke-width': 5 }),
+    s('path', { d: PATHS[shape], fill: pieceColor, ...line(4.5), 'stroke-width': 5 }),
     s('circle', { cx: 50, cy: shape === 'triangle' ? 62 : 50, r: 10, fill: P.wood, ...line(3.5) }),
     s('path', { d: `M46 ${shape === 'triangle' ? 58 : 46} q3 -3 6 -1`, fill: 'none', ...line(2, P.white) }),
   );
@@ -59,7 +60,7 @@ function boxLidArt() {
   const g = svg(200, 60);
   g.append(
     s('path', { d: 'M8 52 C12 14 188 14 192 52 Z', fill: P.wood, ...line(4) }),
-    s('rect', { x: 84, y: 6, width: 32, height: 14, rx: 7, fill: P.blue, ...line(3.5) }),
+    s('rect', { x: 84, y: 6, width: 32, height: 14, rx: 7, fill: pieceColor, ...line(3.5) }),
   );
   g.setAttribute('filter', CRAYON_LITE);
   return g;
@@ -111,6 +112,8 @@ function grid(n, cols, area) {
 }
 
 function round(root, ctx) {
+  const choices = LEARN_COLORS.filter((c) => c.color !== pieceColor);
+  pieceColor = choices[Math.floor(Math.random() * choices.length)].color;
   root.replaceChildren();
   const shapes = LEVELS[ctx.level] || LEVELS[1];
   const n = shapes.length;
